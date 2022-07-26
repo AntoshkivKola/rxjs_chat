@@ -7,11 +7,25 @@ const { Server } = require("socket.io");
 const port = 3333;
 
 app.use(cors())
+app.use(express.json())
+
 let count = 0;
 app.get('/', (req: any, res: any) => {
     console.log('get request')
     res.send({text: 'Hello World!', count: count++})
-})
+});
+
+app.post('/login', async (req: any, res: any) => {
+    const {login, password} = req.body;
+
+    const user = await Users.findOne({login, password});
+
+    if (user) {
+        return res.send(user)
+    }
+
+    return res.sendStatus(404);
+});
 
 const server = app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
