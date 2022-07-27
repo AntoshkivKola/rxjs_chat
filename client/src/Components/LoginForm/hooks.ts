@@ -1,6 +1,6 @@
 import {useState, useEffect} from "react";
 import React from "react";
-import {fromEvent, Subscription} from "rxjs";
+import {fromEvent, Subscription, tap} from "rxjs";
 import {map, pluck, switchMap} from "rxjs/operators";
 import {ajax} from "rxjs/ajax";
 
@@ -48,11 +48,8 @@ export const useLoginForm = () => {
         setLoading(true);
         try {
             const login$ = ajax({
-
                 url: 'http://localhost:3333/login',
                 method: 'POST',
-                crossDomain: true,
-                withCredentials: false,
                 body: {login, password}
             }).pipe(
                 pluck('response')
@@ -64,8 +61,9 @@ export const useLoginForm = () => {
 
             console.log('r', r)
 
-            const r2 = await fetch('http://localhost:3333/', {
-                method: 'GET',
+            const r2 = await fetch('http://localhost:3333/login', {
+                method: 'POST',
+                body: JSON.stringify({login, password}),
             });
 
             console.log('r2', r2)

@@ -28,8 +28,7 @@ const getUsers = async () => {
 
 const port = 3333;
 
-//app.use(cors())
-app.options('*', cors())
+app.use(cors())
 app.use(express.json())
 
 let count = 0;
@@ -61,8 +60,8 @@ const server = app.listen(port, () => {
 
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:8080",
-        methods: ["GET", "POST"]
+        origin: "*",
+        methods: ["GET", "POST", "OPTIONS"]
     }
 });
 io.on('connection', (socket: Socket) => {

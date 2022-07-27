@@ -16,11 +16,11 @@ export const LoginForm: FC = () => {
     return (
         <div>
             <h1>Login</h1>
-            <form id="login-form" onSubmit={handleSubmit}>
+            <div>
                 <input type="text" id="login-input"  value={login} onChange={handleLoginChange} />
                 <input type="password" id="password-input"  value={password} onChange={handlePasswordChange} />
-                <button type="submit">Login</button>
-            </form>
+                <button type="button" onClick={handleSubmit}>Login</button>
+            </div>
         </div>
     );
 }
