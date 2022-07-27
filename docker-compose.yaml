@@ -1,4 +1,4 @@
-version: '1.0'
+version: '3.8'
 services:
   front:
     build:
@@ -11,7 +11,7 @@ services:
       - ./client:/client
       - /client/node_modules
     ports:
-      - "8080:8080"
+      - "3000:3000"
     stdin_open: true
     tty: true  
 

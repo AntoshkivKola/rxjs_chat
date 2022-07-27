@@ -33,6 +33,11 @@ app.get('/', (req: any, res: any) => {
     console.log('get request')
     res.send({text: 'Hello World!', count: count++})
 });
+//
+app.get('/seedUsers', (req: any, res: any) => {
+    seedUsers();
+    res.send(getUsers())
+});
 
 app.post('/login', async (req: any, res: any) => {
     const {login, password} = req.body;

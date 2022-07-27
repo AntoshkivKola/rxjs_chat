@@ -2,6 +2,19 @@ import { ajax } from 'rxjs/ajax';
 import {map, pluck, switchMap} from 'rxjs/operators';
 import {fromEvent} from "rxjs";
 import {io} from "socket.io-client";
+// @ts-ignore
+import {createRoot} from "react-dom/client";
+
+import {App} from './App';
+import React from 'react';
+
+const root = createRoot(document.getElementById('root'));
+
+// @ts-ignore
+root.render(
+    <App />
+);
+/*
 
 const loginForm = document.querySelector('#login-form') as HTMLFormElement;
 const loginInput = document.querySelector('#login-input') as HTMLInputElement;
@@ -40,6 +53,7 @@ export interface IUser {
 }
 
 let user: IUser;
+let messages: IMessage[];
 
 login$.subscribe((data: any) => {
     console.log(data);
@@ -47,6 +61,14 @@ login$.subscribe((data: any) => {
     if (user) {
         userLoginElement.innerHTML = `${user.name}`;
         userLoginElement.style.backgroundColor = user.color;
+
+        if(user.messages.length > 0) {
+            messages = user.messages.sort((a, b) => {
+                return new Date(a.data).getTime() - new Date(b.data).getTime();
+            });
+
+            console.log('messages',messages)
+        }
     }
 });
 
@@ -85,3 +107,4 @@ const subscribe = users.subscribe(
     },
     err => console.error(err)
 );
+*/

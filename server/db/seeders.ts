@@ -1,7 +1,7 @@
 import {Users} from './models';
 
 
-export const seedUsers = async () => {
+export const seedUsers = () => {
     const bob = new Users({
         name: 'Bob',
         color: 'red',
@@ -26,6 +26,14 @@ export const seedUsers = async () => {
         messages: [{
             text: 'Hello',
             data: '2022-07-26T12:00:00.000Z',
+        },
+        {
+            text: 'World',
+            data: '2022-07-27T12:00:00.000Z',
+        },
+        {
+            text: 'Hi!',
+            data: '2022-06-27T12:00:00.000Z',
         }],
     });
 
