@@ -3,9 +3,10 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const { Server } = require("socket.io");
-import {Users} from "./db/models";
+/*import {Users} from "./db/models";
 import {IUser} from "./db/shcemas";
-import {seedUsers} from "./db/seeders";
+import {seedUsers} from "./db/seeders";*/
+/*
 
 const getUsers = async () => {
     Users.find({}, (err: any, users: IUser[] ) => {
@@ -20,12 +21,15 @@ const getUsers = async () => {
         }
     });
 }
-getUsers();
+*/
+
+//getUsers();
 //
 
 const port = 3333;
 
-app.use(cors())
+//app.use(cors())
+app.options('*', cors())
 app.use(express.json())
 
 let count = 0;
@@ -34,16 +38,16 @@ app.get('/', (req: any, res: any) => {
     res.send({text: 'Hello World!', count: count++})
 });
 //
-app.get('/seedUsers', (req: any, res: any) => {
+/*app.get('/seedUsers', (req: any, res: any) => {
     seedUsers();
     res.send(getUsers())
-});
+});*/
 
 app.post('/login', async (req: any, res: any) => {
     const {login, password} = req.body;
-
-    const user = await Users.findOne({login, password});
-
+    console.log('/login req.body',req.body);
+    //const user = await Users.findOne({login, password});
+    const user = {};
     if (user) {
         return res.send(user)
     }
