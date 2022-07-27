@@ -1,0 +1,40 @@
+version: '1.0'
+services:
+  front:
+    build:
+      context: ./client
+    environment:
+      NODE_ENV: development
+    depends_on:
+      - server
+    volumes:
+      - ./client:/client
+      - /client/node_modules
+    ports:
+      - "8080:8080"
+    stdin_open: true
+    tty: true  
+
+  server:
+    build:
+      context: ./server
+    environment:
+      NODE_ENV: development
+    ports:
+      - "3333:3333"
+      - "9229:9229"
+    depends_on:
+      - mongo-db
+    volumes:
+      - ./server:/server
+      - /server/node_modules
+
+  mongo-db:
+    image: mongo:3.6
+    ports:
+      - "27017:27017"
+    volumes:
+      - /home/mykola/mongo-db:/data/db
+
+volumes:
+  server-dev:

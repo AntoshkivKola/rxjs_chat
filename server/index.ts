@@ -3,6 +3,25 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const { Server } = require("socket.io");
+import {Users} from "./db/models";
+import {IUser} from "./db/shcemas";
+import {seedUsers} from "./db/seeders";
+
+const getUsers = async () => {
+    Users.find({}, (err: any, users: IUser[] ) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(users);
+
+            if (users.length === 0) {
+                seedUsers();
+            }
+        }
+    });
+}
+getUsers();
+//
 
 const port = 3333;
 
