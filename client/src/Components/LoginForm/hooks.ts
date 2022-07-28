@@ -1,33 +1,39 @@
 import {useState, useEffect} from "react";
 import React from "react";
-import {fromEvent, Subscription, tap} from "rxjs";
+import {BehaviorSubject, fromEvent, Subscription, tap} from "rxjs";
 import {map, pluck, switchMap} from "rxjs/operators";
 import {ajax} from "rxjs/ajax";
+import {IMessage, IUser} from "../../types/user";
 
-interface IMessage {
-    text: string;
-    data: string;
+const userSubject = new BehaviorSubject(null);
+
+
+type TLoginForm = {
+    currentUser: IUser;
+    setCurrentUser: Function;
 }
 
-interface IUser {
-    name: string;
-    color: string;
-    login: string;
-    password: string;
-    messages: IMessage[];
-}
-
-type LoginFormProps = {
+type TLogin = {
     login: string;
     password: string;
 }
 
+const useObservable = (observable: any, setter: any) => {
+    console.log('useObservable');
+    useEffect(() => {
+        console.log('ese effect')
+        const subscription = observable.subscribe((value: any) => {
+            console.log('value: ', value);
+            setter(value);
+        });
+        //return () => subscription.unsubscribe();
+    }, []);
+}
 
-export const useLoginForm = () => {
+export const useLoginForm = ({currentUser, setCurrentUser}: TLoginForm) => {
     const [error, setError] = useState('');
     const [isLoading, setLoading] = useState(false);
 
-    const [user, setUser] = useState<IUser>();
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
@@ -40,68 +46,46 @@ export const useLoginForm = () => {
         setPassword(e.target.value);
     }
 
-
-
-    let loginSubscription: Subscription;
-
-    const makeRequest = async ({login, password}: LoginFormProps) => {
+    const makeRequest = ({login, password}: TLogin) => {
         setLoading(true);
         try {
-            const login$ = ajax({
-                url: 'http://localhost:3333/login',
-                method: 'POST',
-                body: {login, password}
-            }).pipe(
-                pluck('response')
-            );
+            const login$ = userSubject.pipe(
+                switchMap(() =>  ajax({
+                    url: 'http://localhost:3333/login',
+                    method: 'POST',
+                    body: {login, password}
+                }).pipe(
+                    map(({response}) => response),
+                ))
 
-            const r = await fetch('https://reqres.in/api/products/3', {
-                method: 'GET',
-            });
+            )
 
-            console.log('r', r)
-
-            const r2 = await fetch('http://localhost:3333/login', {
-                method: 'POST',
-                body: JSON.stringify({login, password}),
-            });
-
-            console.log('r2', r2)
-
-
-
-            loginSubscription = login$.subscribe((data: any) => {
+            login$.subscribe((data: any) => {
                 console.log(data);
-                setUser(data);
-                if (user) {
-                    if(user.messages.length > 0) {
+                setCurrentUser(data);
+                /*if (currentUser) {
+                    if(currentUser.messages.length > 0) {
                         setMessages(
-                            user.messages.sort((a, b) => {
+                            currentUser.messages.sort((a, b) => {
                                 return new Date(a.data).getTime() - new Date(b.data).getTime();
                             })
                         );
 
                         console.log('messages',messages)
                     }
-                }
-            });
-
-            //await login(email, password);
+                }*/
+            })
         } catch (error: any) {
             setError(error.message);
         } finally {
-            loginSubscription.unsubscribe();
+            setLoading(false);
         }
-        setLoading(false);
     }
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = (e: any) => {
         e.preventDefault();
-        await makeRequest({login, password});
-        console.log('e', e)
-        console.log('states', login, password)
+        makeRequest({login, password});
     }
-
 
     return {
         error,

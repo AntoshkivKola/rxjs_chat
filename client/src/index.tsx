@@ -11,12 +11,9 @@ import React from 'react';
 const root = createRoot(document.getElementById('root'));
 
 
-const socket = io('http://localhost:3333');
 
 // @ts-ignore
-root.render(
-    <App />
-);
+root.render(<App/>);
 /*
 
 const loginForm = document.querySelector('#login-form') as HTMLFormElement;
