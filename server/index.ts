@@ -3,10 +3,10 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const { Server } = require("socket.io");
-/*import {Users} from "./db/models";
+import {Users} from "./db/models";
 import {IUser} from "./db/shcemas";
-import {seedUsers} from "./db/seeders";*/
-/*
+import {seedUsers} from "./db/seeders";
+import {addMessage, getGroupMessages, getMainGroup, getUserFromGroup} from "./api/controllers/userController";
 
 const getUsers = async () => {
     Users.find({}, (err: any, users: IUser[] ) => {
@@ -21,7 +21,6 @@ const getUsers = async () => {
         }
     });
 }
-*/
 
 //getUsers();
 //
@@ -36,17 +35,16 @@ app.get('/', (req: any, res: any) => {
     console.log('get request')
     res.send({text: 'Hello World!', count: count++})
 });
-//
-/*app.get('/seedUsers', (req: any, res: any) => {
+
+app.get('/seedUsers', (req: any, res: any) => {
     seedUsers();
     res.send(getUsers())
-});*/
+});
 
 app.post('/login', async (req: any, res: any) => {
     const {login, password} = req.body;
     console.log('/login req.body',req.body);
-    //const user = await Users.findOne({login, password});
-    const user = {};
+    const user = await Users.findOne({login, password});
     if (user) {
         return res.send(user)
     }
@@ -57,7 +55,7 @@ app.post('/login', async (req: any, res: any) => {
 const server = app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
-
+//
 const io = new Server(server, {
     cors: {
         origin: "*",
@@ -67,9 +65,47 @@ const io = new Server(server, {
 io.on('connection', (socket: Socket) => {
     console.log('a user connected');
 
-    socket.on('chat message', (msg) => {
-        console.log('message: ' + msg);
+    socket.on('chat message', async ({author, message, group}) => {
+        try {
+            await addMessage(author, message, group);
+            const massages = await getGroupMessages(group._id);
+
+            io.emit('send massages', massages);
+        } catch (e) {
+            console.log(e);
+        }
+        console.log('message: ', message, ' author: ', author);
     });
+
+    socket.on('getGroupMessages', async ({groupId}) => {
+        try {
+            const massages = await getGroupMessages(groupId);
+            //console.log('massages: ', groupId, massages);
+            io.emit('send massages', massages);
+        } catch (e) {
+            console.log(e);
+        }
+    });
+
+    socket.on('getUserFromGroup', async ({groupId}) => {
+        try {
+            const userFromGroup = await getUserFromGroup(groupId);
+            console.log('userFromGroup', userFromGroup)
+            io.emit('send users', userFromGroup);
+        } catch (e) {
+            console.log(e);
+        }
+    });
+
+    socket.on('getMainGroup', async () => {
+        try {
+            const mainGroup = await getMainGroup();
+
+            io.emit('send group', mainGroup);
+        } catch (e) {
+            console.log(e);
+        }
+    })
 
 
     socket.on('disconnect', () => {
