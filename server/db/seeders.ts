@@ -1,44 +1,63 @@
-import {Users} from './models';
+import {Users, Groups, Massages} from './models';
 
 
-export const seedUsers = () => {
-    const bob = new Users({
+export const seedUsers = async () => {
+    const bob = await new Users({
         name: 'Bob',
         color: 'red',
         login: 'bob',
         password: 'bob',
-        messages: [],
     });
 
-    const alice = new Users({
+    const alice = await new Users({
         name: 'Alice',
         color: 'blue',
         login: 'alice',
         password: 'alice',
-        messages: [],
     });
 
-    const john = new Users({
+    const john = await new Users({
         name: 'John',
         color: 'green',
         login: 'john',
         password: 'john',
-        messages: [{
-            text: 'Hello',
-            data: '2022-07-26T12:00:00.000Z',
-        },
-        {
-            text: 'World',
-            data: '2022-07-27T12:00:00.000Z',
-        },
-        {
-            text: 'Hi!',
-            data: '2022-06-27T12:00:00.000Z',
-        }],
     });
+
+    const mainGroup = await new Groups({
+        name: 'Main',
+        members: [bob._id, alice._id, john._id],
+    });
+
+    await Massages.collection.insertMany([
+        {
+            text: 'Hello',
+            data: '7/28/2022, 0:00:00 PM',
+            group_id: mainGroup._id,
+            author_id: alice._id,
+        },
+        {
+            text: 'Hello',
+            data: '7/28/2022, 0:00:00 PM',
+            group_id: mainGroup._id,
+            author_id: bob._id,
+        },
+        {
+            text: 'Hello 2',
+            data: '7/28/2022, 0:00:01 PM',
+            group_id: mainGroup._id,
+            author_id: bob._id,
+        },
+        {
+            text: 'Hello',
+            data: '7/28/2022, 0:00:00 PM',
+            group_id: mainGroup._id,
+            author_id: john._id,
+        },
+    ]);
 
     bob.save();
     alice.save();
     john.save();
+    mainGroup.save();
 }
 

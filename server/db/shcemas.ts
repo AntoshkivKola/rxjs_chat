@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 export interface IMessage {
     text: string;
     data: string;
+    _id: string;
 }
 
 export interface IUser {
@@ -10,7 +11,13 @@ export interface IUser {
     color: string;
     login: string;
     password: string;
-    messages: IMessage[];
+    _id: string;
+}
+
+export interface IGroup {
+    _id: string;
+    name: string;
+    members: any[];
 }
 
 export const usersSchema: IUser = new mongoose.Schema({
@@ -18,8 +25,29 @@ export const usersSchema: IUser = new mongoose.Schema({
     login: String,
     password: String,
     color: String,
-    messages: [{
-        text: String,
-        data: String
-    }]
 });
+
+
+export const groupsSchema: IGroup = new mongoose.Schema({
+    name: String,
+    members: [{
+        type: mongoose.Schema.ObjectId,
+        required: true,
+    }]
+})
+
+export const massagesSchema: IMessage = new mongoose.Schema({
+    text: String,
+    data: String,
+    group_id: {
+        type: mongoose.Schema.ObjectId,
+        ref: "Groups",
+        required: true,
+    },
+    author_id: {
+        type: mongoose.Schema.ObjectId,
+        required: true,
+        ref: "Users",
+    }
+});
+
