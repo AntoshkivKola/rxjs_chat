@@ -1,6 +1,7 @@
 import {Server, Socket} from "socket.io";
 import {addMessage, getGroupMessages, getUserFromGroup} from "../api/controllers/userController";
-import {getMainGroup, getUserGroups} from "../api/controllers/groupController";
+import {addUserToGroup, getMainGroup, getUserGroups, removeUserFromGroup} from "../api/controllers/groupController";
+import {IGroup} from "../db/shcemas";
 
 export const initSocket = (server: any) => {
     const io = new Server(server, {
@@ -58,12 +59,38 @@ export const initSocket = (server: any) => {
         socket.on('getUserGroups', async (userId) => {
             try {
                 const groups = await getUserGroups(userId);
-                console.log('groups', groups);
+
                 io.emit('getGroups', groups);
             } catch (e) {
                 console.log(e);
             }
-        })
+        });
+
+        socket.on('addUserToGroup', async ({userId, groupId, currentUserId}) => {
+            try {
+                await addUserToGroup(userId, groupId);
+                const groups = await getUserGroups(currentUserId) as IGroup[];
+                const currentGroup = groups.find(group => group._id === groupId);
+
+                io.emit('getGroups', groups);
+                io.emit('getGroup', currentGroup);
+            } catch (e) {
+                console.log(e);
+            }
+        });
+
+        socket.on('removeUserFromGroup', async ({userId, groupId, currentUserId}) => {
+            try {
+                await removeUserFromGroup(userId, groupId);
+                const groups = await getUserGroups(currentUserId) as IGroup[];
+                const currentGroup = groups.find(group => group._id.toString() === groupId);
+                console.log('!!!removeUserFromGroup', currentGroup, groupId);
+                io.emit('getGroups', groups);
+                io.emit('getGroup', currentGroup);
+            } catch (e) {
+                console.log(e);
+            }
+        });
 
 
         socket.on('disconnect', () => {

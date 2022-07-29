@@ -26,11 +26,13 @@ export const seedUsers = async () => {
     const mainGroup = await new Groups({
         name: 'Main',
         members: [bob._id, alice._id, john._id],
+        owner_id: john._id,
     });
 
     const secondGroup = await new Groups({
         name: 'Second Group',
         members: [bob._id, john._id],
+        owner_id: bob._id,
     });
 
     await Massages.collection.insertMany([

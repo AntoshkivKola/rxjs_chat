@@ -18,6 +18,7 @@ export interface IGroup {
     _id: string;
     name: string;
     members: any[];
+    owner_id: string;
 }
 
 export const usersSchema: IUser = new mongoose.Schema({
@@ -33,7 +34,12 @@ export const groupsSchema: IGroup = new mongoose.Schema({
     members: [{
         type: mongoose.Schema.ObjectId,
         required: true,
-    }]
+    }],
+    owner_id: {
+        type: mongoose.Schema.ObjectId,
+        required: true,
+        ref: "Users",
+    }
 })
 
 export const massagesSchema: IMessage = new mongoose.Schema({

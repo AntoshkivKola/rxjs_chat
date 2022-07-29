@@ -8,6 +8,7 @@ import {useSocket} from "./socket_manager";
 import {Chat} from "./Components/Chat";
 import styles from './App.module.scss';
 import {GroupsList} from "./Components/GroupsList";
+import {CurrentGroup} from "./Components/CurrentGroup";
 
 const initialUser = {
     _id: '',
@@ -18,10 +19,11 @@ const initialUser = {
     messages: [],
 }
 
-const initialGroup = {
+export const initialGroup = {
     name: '',
     members: [],
-    _id: ''
+    _id: '',
+    owner_id: '-',
 }
 
 const isStandardUser = (user: IUser) => {
@@ -77,6 +79,9 @@ export const App: FC = () => {
             <div className={styles.userContainer}>
                 <LoginForm currentUser={currentUser} setCurrentUser={setCurrentUser} />
                 {currentUser && <CurrentUser currentUser={currentUser} />}
+                {currentGroup && <CurrentGroup currentGroup={currentGroup}
+                                               users={users}
+                                               currentUser={currentUser} />}
             </div>
 
 

@@ -17,4 +17,5 @@ export interface IGroup {
     _id: string;
     name: string;
     members: string[];
+    owner_id: string;
 }
