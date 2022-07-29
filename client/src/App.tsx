@@ -4,7 +4,7 @@ import {LoginForm} from "./Components/LoginForm";
 import {IGroup, IMessage, IUser} from "./types/user";
 import {CurrentUser} from "./Components/CurrentUser";
 import {ChatForm} from "./Components/ChatForm";
-import {socket_manager} from "./socket_manager";
+import {useSocket} from "./socket_manager";
 import {Chat} from "./Components/Chat";
 
 const initialUser = {
@@ -26,37 +26,6 @@ const isStandardUser = (user: IUser) => {
     return user.name === 'Test';
 }
 
-const initSomeSocketLogic = ({setCurrentUser, setUsers, setCurrentGroup, setMessages} : any) => {
-    useEffect(() => {
-
-        socket_manager.on('getUpdatedUser', (updatedUser) => {
-            console.log('send updated user');
-            setCurrentUser(updatedUser);
-        })
-
-        socket_manager.on('getUsers', (users) => {
-            console.log('send users');
-            setUsers(users);
-        })
-
-        socket_manager.on('getGroup', (group) => {
-            console.log('send group', group);
-            setCurrentGroup(group);
-            if (group._id) {
-                socket_manager.emit('getGroupMessages', {groupId: group._id});
-                socket_manager.emit('getUserFromGroup', {groupId: group._id});
-            }
-        })
-
-
-        socket_manager.on('getMassages', (messages) => {
-            console.log('send massages', messages);
-            setMessages(messages);
-        })
-
-    }, [])
-}
-
 export const App: FC = () => {
     const [currentUser, setCurrentUser] = useState<IUser>(initialUser);
     const [messages, setMessages] = useState<IMessage[]>([]);
@@ -64,11 +33,23 @@ export const App: FC = () => {
     const [users, setUsers] = useState<IUser[]>([]);
 
     useEffect(() => {
-        socket_manager.emit('getMainGroup');
-        console.log('group._id', {groupId : currentGroup._id})
-    }, []);
+        const socketMan = useSocket();
+        socketMan.send('getMainGroup', null);
 
-    initSomeSocketLogic({setCurrentUser, setUsers, setCurrentGroup, setMessages});
+        socketMan.on('getGroup').subscribe(
+            (group: IGroup) => {
+                console.log('getGroup', group);
+                setCurrentGroup(group);
+                socketMan.send('getGroupMessages', {groupId: group._id});
+                socketMan.send('getUserFromGroup', {groupId: group._id});
+            }
+        );
+
+        socketMan.on('getUsers').subscribe(setUsers);
+        socketMan.on('getMessages').subscribe(setMessages);
+
+        return () => { socketMan.disconnect() }
+    }, []);
 
     if (currentUser) {
         console.log('currentUser', currentUser);

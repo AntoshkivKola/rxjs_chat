@@ -1,24 +1,32 @@
-import React, {FC, useState} from "react";
-import {socket_manager} from "../../socket_manager";
+import React, {FC, useEffect} from "react";
+import {useSocket} from "../../socket_manager";
+import {fromEvent, tap, withLatestFrom} from "rxjs";
+import {map} from "rxjs/operators";
 
 export const ChatForm: FC<any> = (props: any) => {
-    const {currentUser, currentGroup, updateMessages} = props;
+    const {currentUser, currentGroup} = props;
 
-    const [message, setMessage] = useState("");
+    useEffect(() => {
+        const sendBtn = document.getElementById('sendMessage') as HTMLButtonElement;
+        const input = document.getElementById('message') as HTMLInputElement;
+        const {send} = useSocket();
 
-    const handleSubmit = async (e: any) => {
-        socket_manager.emit('chat message', {message, author: currentUser, group: currentGroup});
-        setMessage("");
-    }
-
-    const handleMessageChange = (e: any) => {
-        setMessage(e.target.value);
-    }
+        const updateMessage = fromEvent(input, 'input').pipe(
+            map((e: any) => e.target.value)
+        )
+        fromEvent(sendBtn, 'click').pipe(
+            withLatestFrom(updateMessage),
+            tap(([, message]) => {
+                send('chat message', {message, author: currentUser, group: currentGroup});
+                input.value = '';
+            })
+        ).subscribe();
+    }, [])
 
     return (
         <div>
-            <input onChange={handleMessageChange} value={message} type="text" placeholder="message..."/>
-            <button onClick={handleSubmit} type="submit">Send</button>
+            <input id="message" type="text" placeholder="message..."/>
+            <button id="sendMessage" type="submit">Send</button>
         </div>
     );
 }

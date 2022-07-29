@@ -17,7 +17,7 @@ export const initSocket = (server: any) => {
                 await addMessage(author, message, group);
                 const massages = await getGroupMessages(group._id);
 
-                io.emit('getMessage', massages);
+                io.emit('getMessages', massages);
             } catch (e) {
                 console.log(e);
             }
@@ -28,7 +28,7 @@ export const initSocket = (server: any) => {
             try {
                 const massages = await getGroupMessages(groupId);
                 //console.log('massages: ', groupId, massages);
-                io.emit('getMessage', massages);
+                io.emit('getMessages', massages);
             } catch (e) {
                 console.log(e);
             }
