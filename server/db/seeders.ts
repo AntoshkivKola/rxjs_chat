@@ -4,21 +4,21 @@ import {Users, Groups, Massages} from './models';
 export const seedUsers = async () => {
     const bob = await new Users({
         name: 'Bob',
-        color: 'red',
+        color: '#ff0000',
         login: 'bob',
         password: 'bob',
     });
 
     const alice = await new Users({
         name: 'Alice',
-        color: 'blue',
+        color: '#00ff00',
         login: 'alice',
         password: 'alice',
     });
 
     const john = await new Users({
         name: 'John',
-        color: 'green',
+        color: '#0000ff',
         login: 'john',
         password: 'john',
     });

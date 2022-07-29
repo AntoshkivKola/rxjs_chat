@@ -1,0 +1,24 @@
+.messageContainer{
+	list-style-type: none;
+}
+.messageItem{
+	display: flex;
+	flex-direction: row;
+	align-items: flex-end;
+	min-width: 290px;
+	margin-top: 5px;
+}
+.messageAuthor{
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	margin-right: 10px;
+}
+.messageText{
+	min-width: 30px;
+	min-height: 18px;
+	padding: 5px;
+	border-radius: 10px;
+	color: #000;
+	font-size: 16px;
+}
