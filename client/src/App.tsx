@@ -30,9 +30,10 @@ const isStandardUser = (user: IUser) => {
 
 export const App: FC = () => {
     const [currentUser, setCurrentUser] = useState<IUser>(initialUser);
+    const [users, setUsers] = useState<IUser[]>([]);
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [currentGroup, setCurrentGroup] = useState<IGroup>(initialGroup);
-    const [users, setUsers] = useState<IUser[]>([]);
+    const [groups, setGroups] = useState<IGroup[]>([]);
 
     useEffect(() => {
         const socketMan = useSocket();
@@ -49,6 +50,7 @@ export const App: FC = () => {
 
         socketMan.on('getUsers').subscribe(setUsers);
         socketMan.on('getMessages').subscribe(setMessages);
+        socketMan.on('getGroups').subscribe(setGroups);
 
         return () => { socketMan.disconnect() }
     }, []);
@@ -61,7 +63,7 @@ export const App: FC = () => {
 
         <div className={styles.appContainer}>
             <div className={styles.groupsContainer}>
-                <GroupsList />
+                <GroupsList groups={groups} setCurrentGroup={setCurrentGroup}/>
             </div>
             <div className={styles.chatContainer}>
                 <div className={styles.messagesContainer}>

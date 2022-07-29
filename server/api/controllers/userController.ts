@@ -48,15 +48,6 @@ export const getUserFromGroup = async (groupId: string) => {
     }
 }
 
-export const getMainGroup = async () => {
-    try {
-        return await Groups.findOne({name: 'Main'});
-    } catch (e) {
-        console.log(e);
-    }
-}
-
-
 export const checkAndSeedUsers = async () => {
     Users.find({}, (err: any, users: IUser[] ) => {
         if (err) {

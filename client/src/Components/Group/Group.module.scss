@@ -1,0 +1,23 @@
+.groupContainer{
+	list-style-type: none;
+}
+.groupItem{
+	display: flex;
+	flex-direction: row;
+	align-items: flex-end;
+	min-width: 290px;
+	background-color: #e7e6e6;
+	border-bottom: 1px solid #ccc;
+	border-top: 1px solid #ccc;
+	cursor: pointer;
+
+	padding: 5px 10px;
+
+	&:hover{
+		background-color: #7b818e;
+	}
+}
+
+.groupName{
+
+}

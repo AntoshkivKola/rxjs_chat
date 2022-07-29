@@ -1,5 +1,6 @@
 import {Server, Socket} from "socket.io";
-import {addMessage, getGroupMessages, getMainGroup, getUserFromGroup} from "../api/controllers/userController";
+import {addMessage, getGroupMessages, getUserFromGroup} from "../api/controllers/userController";
+import {getMainGroup, getUserGroups} from "../api/controllers/groupController";
 
 export const initSocket = (server: any) => {
     const io = new Server(server, {
@@ -49,6 +50,16 @@ export const initSocket = (server: any) => {
                 const mainGroup = await getMainGroup();
 
                 io.emit('getGroup', mainGroup);
+            } catch (e) {
+                console.log(e);
+            }
+        })
+
+        socket.on('getUserGroups', async (userId) => {
+            try {
+                const groups = await getUserGroups(userId);
+                console.log('groups', groups);
+                io.emit('getGroups', groups);
             } catch (e) {
                 console.log(e);
             }

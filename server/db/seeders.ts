@@ -28,6 +28,11 @@ export const seedUsers = async () => {
         members: [bob._id, alice._id, john._id],
     });
 
+    const secondGroup = await new Groups({
+        name: 'Second Group',
+        members: [bob._id, john._id],
+    });
+
     await Massages.collection.insertMany([
         {
             text: 'Hello',
@@ -53,11 +58,30 @@ export const seedUsers = async () => {
             group_id: mainGroup._id,
             author_id: john._id,
         },
+        {
+            text: 'Hello',
+            data: '7/28/2022, 0:00:00 PM',
+            group_id: secondGroup._id,
+            author_id: bob._id,
+        },
+        {
+            text: '!',
+            data: '7/28/2022, 0:00:01 PM',
+            group_id: secondGroup._id,
+            author_id: bob._id,
+        },
+        {
+            text: 'Hi',
+            data: '7/29/2022, 0:00:00 PM',
+            group_id: secondGroup._id,
+            author_id: john._id,
+        },
     ]);
 
     bob.save();
     alice.save();
     john.save();
     mainGroup.save();
+    secondGroup.save();
 }
 
