@@ -17,7 +17,7 @@ export const initSocket = (server: any) => {
                 await addMessage(author, message, group);
                 const massages = await getGroupMessages(group._id);
 
-                io.emit('send massages', massages);
+                io.emit('getMessage', massages);
             } catch (e) {
                 console.log(e);
             }
@@ -28,7 +28,7 @@ export const initSocket = (server: any) => {
             try {
                 const massages = await getGroupMessages(groupId);
                 //console.log('massages: ', groupId, massages);
-                io.emit('send massages', massages);
+                io.emit('getMessage', massages);
             } catch (e) {
                 console.log(e);
             }
@@ -38,7 +38,7 @@ export const initSocket = (server: any) => {
             try {
                 const userFromGroup = await getUserFromGroup(groupId);
                 console.log('userFromGroup', userFromGroup)
-                io.emit('send users', userFromGroup);
+                io.emit('getUsers', userFromGroup);
             } catch (e) {
                 console.log(e);
             }
@@ -48,7 +48,7 @@ export const initSocket = (server: any) => {
             try {
                 const mainGroup = await getMainGroup();
 
-                io.emit('send group', mainGroup);
+                io.emit('getGroup', mainGroup);
             } catch (e) {
                 console.log(e);
             }

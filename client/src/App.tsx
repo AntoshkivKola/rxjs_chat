@@ -29,17 +29,17 @@ const isStandardUser = (user: IUser) => {
 const initSomeSocketLogic = ({setCurrentUser, setUsers, setCurrentGroup, setMessages} : any) => {
     useEffect(() => {
 
-        socket_manager.on('send updated user', (updatedUser) => {
+        socket_manager.on('getUpdatedUser', (updatedUser) => {
             console.log('send updated user');
             setCurrentUser(updatedUser);
         })
 
-        socket_manager.on('send users', (users) => {
+        socket_manager.on('getUsers', (users) => {
             console.log('send users');
             setUsers(users);
         })
 
-        socket_manager.on('send group', (group) => {
+        socket_manager.on('getGroup', (group) => {
             console.log('send group', group);
             setCurrentGroup(group);
             if (group._id) {
@@ -49,7 +49,7 @@ const initSomeSocketLogic = ({setCurrentUser, setUsers, setCurrentGroup, setMess
         })
 
 
-        socket_manager.on('send massages', (messages) => {
+        socket_manager.on('getMassages', (messages) => {
             console.log('send massages', messages);
             setMessages(messages);
         })
