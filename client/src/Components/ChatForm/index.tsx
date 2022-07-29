@@ -1,27 +1,10 @@
-import React, {FC, useEffect} from "react";
-import {useSocket} from "../../socket_manager";
-import {fromEvent, tap, withLatestFrom} from "rxjs";
-import {map} from "rxjs/operators";
+import React, {FC} from "react";
+import {useChatForm} from "./hook";
 
 export const ChatForm: FC<any> = (props: any) => {
     const {currentUser, currentGroup} = props;
 
-    useEffect(() => {
-        const sendBtn = document.getElementById('sendMessage') as HTMLButtonElement;
-        const input = document.getElementById('message') as HTMLInputElement;
-        const {send} = useSocket();
-
-        const updateMessage = fromEvent(input, 'input').pipe(
-            map((e: any) => e.target.value)
-        )
-        fromEvent(sendBtn, 'click').pipe(
-            withLatestFrom(updateMessage),
-            tap(([, message]) => {
-                send('chat message', {message, author: currentUser, group: currentGroup});
-                input.value = '';
-            })
-        ).subscribe();
-    }, [])
+    useChatForm(currentUser, currentGroup);
 
     return (
         <div>

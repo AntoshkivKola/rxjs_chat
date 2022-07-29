@@ -1,100 +1,32 @@
-import {useState, useEffect} from "react";
-import React from "react";
-import {BehaviorSubject, fromEvent, Subscription, tap} from "rxjs";
-import {map, pluck, switchMap} from "rxjs/operators";
+import {combineLatestWith, fromEvent, withLatestFrom} from "rxjs";
+import {map, switchMap} from "rxjs/operators";
 import {ajax} from "rxjs/ajax";
-import {IMessage, IUser} from "../../types/user";
+import {useEffect} from "react";
 
-const userSubject = new BehaviorSubject(null);
-
-
-type TLoginForm = {
-    currentUser: IUser;
-    setCurrentUser: Function;
-}
-
-type TLogin = {
-    login: string;
-    password: string;
-}
-
-const useObservable = (observable: any, setter: any) => {
-    console.log('useObservable');
+export const useLogin = (setCurrentUser: any) => {
     useEffect(() => {
-        console.log('ese effect')
-        const subscription = observable.subscribe((value: any) => {
-            console.log('value: ', value);
-            setter(value);
-        });
-        //return () => subscription.unsubscribe();
-    }, []);
-}
+        const loginInput = document.getElementById('login-input') as HTMLInputElement;
+        const passwordInput = document.getElementById('password-input') as HTMLInputElement;
+        const loginBtn = document.getElementById('login-btn') as HTMLButtonElement;
 
-export const useLoginForm = ({currentUser, setCurrentUser}: TLoginForm) => {
-    const [error, setError] = useState('');
-    const [isLoading, setLoading] = useState(false);
-
-    const [messages, setMessages] = useState<IMessage[]>([]);
-    const [login, setLogin] = useState('');
-    const [password, setPassword] = useState('');
-
-    const handleLoginChange = (e: any) => {
-        setLogin(e.target.value);
-    }
-
-    const handlePasswordChange = (e: any) => {
-        setPassword(e.target.value);
-    }
-
-    const makeRequest = ({login, password}: TLogin) => {
-        setLoading(true);
-        try {
-            const login$ = userSubject.pipe(
-                switchMap(() =>  ajax({
-                    url: 'http://localhost:3333/login',
-                    method: 'POST',
-                    body: {login, password}
-                }).pipe(
-                    map(({response}) => response),
-                ))
-
-            )
-
-            login$.subscribe((data: any) => {
-                console.log(data);
-                setCurrentUser(data);
-                /*if (currentUser) {
-                    if(currentUser.messages.length > 0) {
-                        setMessages(
-                            currentUser.messages.sort((a, b) => {
-                                return new Date(a.data).getTime() - new Date(b.data).getTime();
-                            })
-                        );
-
-                        console.log('messages',messages)
-                    }
-                }*/
+        const login$ = fromEvent(loginInput, 'input').pipe(
+            map((e: any) => e.target.value)
+        );
+        const password$ = fromEvent(passwordInput, 'input').pipe(
+            map((e: any) => e.target.value),
+            combineLatestWith(login$),
+        );
+        const subscription = fromEvent(loginBtn, 'click').pipe(
+            withLatestFrom(password$),
+            switchMap(([, [password, login]]) => {
+                return ajax.post('http://localhost:3333/login', {login, password});
             })
-        } catch (error: any) {
-            setError(error.message);
-        } finally {
-            setLoading(false);
+        ).subscribe((res: any) => {
+            setCurrentUser(res.response);
+        },)
+
+        return () => {
+            subscription.unsubscribe();
         }
-    }
-
-    const handleSubmit = (e: any) => {
-        e.preventDefault();
-        makeRequest({login, password});
-    }
-
-    return {
-        error,
-        setError,
-        isLoading,
-        handleSubmit,
-        handleLoginChange,
-        handlePasswordChange,
-        login,
-        password,
-    }
+    }, []);
 }

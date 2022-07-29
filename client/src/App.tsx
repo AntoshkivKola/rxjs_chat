@@ -60,10 +60,9 @@ export const App: FC = () => {
             <h1>Hello World</h1>
             {isStandardUser(currentUser) && <LoginForm currentUser={currentUser} setCurrentUser={setCurrentUser} />}
             {currentUser && <CurrentUser currentUser={currentUser} />}
-            <Chat messages={messages}  users={users}/>
-            {!isStandardUser(currentUser) &&<ChatForm currentUser={currentUser}
-                                                      currentGroup={currentGroup}
-                                                     />}
+            <Chat messages={messages}  users={users} />
+            {!isStandardUser(currentUser) && <ChatForm currentUser={currentUser}
+                                                      currentGroup={currentGroup} />}
         </div>
     );
 }
