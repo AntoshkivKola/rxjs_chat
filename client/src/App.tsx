@@ -6,6 +6,8 @@ import {CurrentUser} from "./Components/CurrentUser";
 import {ChatForm} from "./Components/ChatForm";
 import {useSocket} from "./socket_manager";
 import {Chat} from "./Components/Chat";
+import styles from './App.module.scss';
+import {GroupsList} from "./Components/GroupsList";
 
 const initialUser = {
     _id: '',
@@ -56,13 +58,27 @@ export const App: FC = () => {
     }
 
     return (
-        <div>
-            <h1>Hello World</h1>
-            {isStandardUser(currentUser) && <LoginForm currentUser={currentUser} setCurrentUser={setCurrentUser} />}
-            {currentUser && <CurrentUser currentUser={currentUser} />}
-            <Chat messages={messages}  users={users} />
-            {!isStandardUser(currentUser) && <ChatForm currentUser={currentUser}
-                                                      currentGroup={currentGroup} />}
+
+        <div className={styles.appContainer}>
+            <div className={styles.groupsContainer}>
+                <GroupsList />
+            </div>
+            <div className={styles.chatContainer}>
+                <div className={styles.messagesContainer}>
+                    <Chat messages={messages}  users={users} />
+                </div>
+                <div className={styles.chatFormContainer}>
+                {{/*!isStandardUser(currentUser)*/} && <ChatForm currentUser={currentUser}
+                                                           currentGroup={currentGroup} />}
+                </div>
+            </div>
+            <div className={styles.userContainer}>
+                <LoginForm currentUser={currentUser} setCurrentUser={setCurrentUser} />
+                {currentUser && <CurrentUser currentUser={currentUser} />}
+            </div>
+
+
+
         </div>
     );
 }

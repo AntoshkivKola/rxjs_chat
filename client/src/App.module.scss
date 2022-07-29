@@ -1,0 +1,40 @@
+
+.appContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100vw;
+    height: 100vh;
+}
+.chatContainer{
+    width: 70%;
+    background-color: #ffa;
+    display: flex;
+    flex-direction: column;
+}
+.userContainer, .groupsContainer{
+    min-width: 15%;
+    max-width: 15%;
+}
+
+.userContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: #14bea2;
+}
+
+.groupsContainer{
+    background-color: #319211;
+}
+
+.messagesContainer{
+    height: 90%;
+}
+
+.chatFormContainer{
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+
+    height: 10%;
+}

@@ -1,0 +1,32 @@
+.formContainer{
+	display: flex;
+	align-items: center;
+	flex-direction: row;
+	justify-content: space-between;
+	padding: 10px 30px;
+	width: 100%;
+	height: 100%;
+}
+
+.chatMessage{
+	width: 75%;
+	height: 30px;
+	display: flex;
+	padding: 5px 10px;
+
+	font-size: 16px;
+}
+
+.buttonSendMessage{
+	width: 20%;
+	height: 50px;
+	background-color: #000000;
+	color: #fff;
+	font-size: 20px;
+	text-align: center;
+	border: none;
+	border-radius: 15px;
+	&:hover {
+		background-color: rgba(0, 0, 0, 0.7);
+	}
+}
