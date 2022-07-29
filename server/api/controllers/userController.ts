@@ -1,5 +1,6 @@
 import {IGroup, IUser} from "../../db/shcemas";
 import {Users, Massages, Groups} from "../../db/models";
+import {seedUsers} from "../../db/seeders";
 
 export const addMessage = async (author: IUser, message: string, group: IGroup) => {
     try {
@@ -53,4 +54,19 @@ export const getMainGroup = async () => {
     } catch (e) {
         console.log(e);
     }
+}
+
+
+export const checkAndSeedUsers = async () => {
+    Users.find({}, (err: any, users: IUser[] ) => {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log(users);
+
+            if (users.length === 0) {
+                seedUsers();
+            }
+        }
+    });
 }
