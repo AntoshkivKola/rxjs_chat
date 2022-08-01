@@ -1,4 +1,4 @@
-import {Namespace, Server, Socket} from "socket.io";
+import {Server, Socket} from "socket.io";
 import {
     addMessage,
     getGroupMessages,
@@ -84,8 +84,12 @@ export const initSocket = (server: any) => {
                 const groups = await getUserGroups(currentUserId) as IGroup[];
                 const currentGroup = groups.find(group => group._id.toString() === groupId);
 
-                //@ts-ignore
-                io.sockets.sockets.get(users[userId]).join(groupId);
+
+                const addUserSocketId = users[userId];
+                if (addUserSocketId) {
+                    //@ts-ignore
+                    io.sockets.sockets.get(addUserSocketId).join(groupId);
+                }
 
                 io.in(groupId).emit('getGroups', groups);
                 socket.emit('getGroup', currentGroup);
@@ -102,12 +106,15 @@ export const initSocket = (server: any) => {
 
                 const groupsUpdatedUser = await getUserGroups(userId) as IGroup[];
                 const mainGroup = await getMainGroup();
-
-                //@ts-ignore
-                const deletedMemberSocket = io.sockets.sockets.get(users[userId]) as Socket;
-                deletedMemberSocket.leave(groupId) ;
-                deletedMemberSocket.emit('getGroups', groupsUpdatedUser);
-                deletedMemberSocket.emit('getGroup', mainGroup);
+                console.log('users', users)
+                const removeUserSocketId = users[userId];
+                if (removeUserSocketId) {
+                    //@ts-ignore
+                    const deletedMemberSocket = io.sockets.sockets.get(users[userId]) as Socket;
+                    deletedMemberSocket.leave(groupId) ;
+                    deletedMemberSocket.emit('getGroups', groupsUpdatedUser);
+                    deletedMemberSocket.emit('getGroup', mainGroup);
+                }
 
                 io.in(groupId).emit('getGroups', groups);
                 io.in(groupId).emit('getGroup', currentGroup);
@@ -125,6 +132,8 @@ export const initSocket = (server: any) => {
 
         socket.on('disconnect', () => {
             console.log('user disconnected');
+
+            users[Object.keys(users).find(key => users[key] === socket.id) as string] = null;
         });
     });
 }

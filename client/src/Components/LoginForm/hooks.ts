@@ -1,4 +1,4 @@
-import {combineLatestWith, fromEvent, withLatestFrom} from "rxjs";
+import {catchError, combineLatestWith, fromEvent, withLatestFrom} from "rxjs";
 import {map, switchMap} from "rxjs/operators";
 import {ajax} from "rxjs/ajax";
 import {useEffect} from "react";
@@ -22,12 +22,18 @@ export const useLogin = (setCurrentUser: any) => {
             withLatestFrom(password$),
             switchMap(([, [password, login]]) => {
                 return ajax.post('http://localhost:3333/login', {login, password});
-            })
+            }),
+            catchError((err) => {
+                console.log('CATCH err', err);
+                return ''
+            }),
         ).subscribe((res: any) => {
-            setCurrentUser(res.response);
-            socketMan.send('join', res.response);
-            socketMan.send('getUserGroups', res.response._id)
-        },)
+            if(res.status === 200) {
+                setCurrentUser(res.response);
+                socketMan.send('join', res.response);
+                socketMan.send('getUserGroups', res.response._id)
+            }
+        })
 
         return () => {
             subscription.unsubscribe();
