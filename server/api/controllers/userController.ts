@@ -61,3 +61,11 @@ export const checkAndSeedUsers = async () => {
         }
     });
 }
+
+export const getNewMembers = async (excludedUsers: string[]) => {
+    try {
+        return await Users.find({_id: { $nin: excludedUsers }});
+    } catch (e) {
+        console.log(e);
+    }
+}

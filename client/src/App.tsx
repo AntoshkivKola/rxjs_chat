@@ -79,7 +79,7 @@ export const App: FC = () => {
             <div className={styles.userContainer}>
                 <LoginForm currentUser={currentUser} setCurrentUser={setCurrentUser} />
                 {currentUser && <CurrentUser currentUser={currentUser} />}
-                {currentGroup && <CurrentGroup currentGroup={currentGroup}
+                {(!isStandardUser(currentUser) && currentGroup) && <CurrentGroup currentGroup={currentGroup}
                                                users={users}
                                                currentUser={currentUser} />}
             </div>

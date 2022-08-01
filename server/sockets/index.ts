@@ -1,5 +1,10 @@
 import {Server, Socket} from "socket.io";
-import {addMessage, getGroupMessages, getUserFromGroup} from "../api/controllers/userController";
+import {
+    addMessage,
+    getGroupMessages,
+    getNewMembers,
+    getUserFromGroup,
+} from "../api/controllers/userController";
 import {addUserToGroup, getMainGroup, getUserGroups, removeUserFromGroup} from "../api/controllers/groupController";
 import {IGroup} from "../db/shcemas";
 
@@ -70,7 +75,7 @@ export const initSocket = (server: any) => {
             try {
                 await addUserToGroup(userId, groupId);
                 const groups = await getUserGroups(currentUserId) as IGroup[];
-                const currentGroup = groups.find(group => group._id === groupId);
+                const currentGroup = groups.find(group => group._id.toString() === groupId);
 
                 io.emit('getGroups', groups);
                 io.emit('getGroup', currentGroup);
@@ -90,6 +95,12 @@ export const initSocket = (server: any) => {
             } catch (e) {
                 console.log(e);
             }
+        });
+
+        socket.on('getNewMembers', async ({excludedUsers}) => {
+            const users = await getNewMembers(excludedUsers);
+            console.log('getNewMembers', users);
+            io.emit('newMembers', users);
         });
 
 
