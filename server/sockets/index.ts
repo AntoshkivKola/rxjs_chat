@@ -1,4 +1,4 @@
-import {Server, Socket} from "socket.io";
+import {Namespace, Server, Socket} from "socket.io";
 import {
     addMessage,
     getGroupMessages,
@@ -16,26 +16,33 @@ export const initSocket = (server: any) => {
         }
     });
 
+    const users: {[key: string]: any} = {};
+
     io.on('connection', (socket: Socket) => {
         console.log('a user connected');
+
+        socket.on('join', function(user){
+            console.log('join', user);
+            users[user._id] = socket.id;
+        })
 
         socket.on('chat message', async ({author, message, group}) => {
             try {
                 await addMessage(author, message, group);
                 const massages = await getGroupMessages(group._id);
 
-                io.emit('getMessages', massages);
+                io.in(group._id).emit('getMessages', massages);
             } catch (e) {
                 console.log(e);
             }
-            console.log('message: ', message, ' author: ', author);
         });
 
         socket.on('getGroupMessages', async ({groupId}) => {
             try {
                 const massages = await getGroupMessages(groupId);
                 //console.log('massages: ', groupId, massages);
-                io.emit('getMessages', massages);
+                socket.join(groupId);
+                socket.emit('getMessages', massages);
             } catch (e) {
                 console.log(e);
             }
@@ -44,8 +51,8 @@ export const initSocket = (server: any) => {
         socket.on('getUserFromGroup', async ({groupId}) => {
             try {
                 const userFromGroup = await getUserFromGroup(groupId);
-                console.log('userFromGroup', userFromGroup)
-                io.emit('getUsers', userFromGroup);
+
+                socket.emit('getUsers', userFromGroup);
             } catch (e) {
                 console.log(e);
             }
@@ -55,7 +62,7 @@ export const initSocket = (server: any) => {
             try {
                 const mainGroup = await getMainGroup();
 
-                io.emit('getGroup', mainGroup);
+                socket.emit('getGroup', mainGroup);
             } catch (e) {
                 console.log(e);
             }
@@ -65,20 +72,23 @@ export const initSocket = (server: any) => {
             try {
                 const groups = await getUserGroups(userId);
 
-                io.emit('getGroups', groups);
+                socket.emit('getGroups', groups);
             } catch (e) {
                 console.log(e);
             }
         });
 
-        socket.on('addUserToGroup', async ({userId, groupId, currentUserId}) => {
+        socket.on('addUserToGroup', async ({userId, groupId, currentUserId}: {userId: string, groupId: string, currentUserId: string}) => {
             try {
                 await addUserToGroup(userId, groupId);
                 const groups = await getUserGroups(currentUserId) as IGroup[];
                 const currentGroup = groups.find(group => group._id.toString() === groupId);
 
-                io.emit('getGroups', groups);
-                io.emit('getGroup', currentGroup);
+                //@ts-ignore
+                io.sockets.sockets.get(users[userId]).join(groupId);
+
+                io.in(groupId).emit('getGroups', groups);
+                socket.emit('getGroup', currentGroup);
             } catch (e) {
                 console.log(e);
             }
@@ -89,9 +99,18 @@ export const initSocket = (server: any) => {
                 await removeUserFromGroup(userId, groupId);
                 const groups = await getUserGroups(currentUserId) as IGroup[];
                 const currentGroup = groups.find(group => group._id.toString() === groupId);
-                console.log('!!!removeUserFromGroup', currentGroup, groupId);
-                io.emit('getGroups', groups);
-                io.emit('getGroup', currentGroup);
+
+                const groupsUpdatedUser = await getUserGroups(userId) as IGroup[];
+                const mainGroup = await getMainGroup();
+
+                //@ts-ignore
+                const deletedMemberSocket = io.sockets.sockets.get(users[userId]) as Socket;
+                deletedMemberSocket.leave(groupId) ;
+                deletedMemberSocket.emit('getGroups', groupsUpdatedUser);
+                deletedMemberSocket.emit('getGroup', mainGroup);
+
+                io.in(groupId).emit('getGroups', groups);
+                io.in(groupId).emit('getGroup', currentGroup);
             } catch (e) {
                 console.log(e);
             }
@@ -99,8 +118,8 @@ export const initSocket = (server: any) => {
 
         socket.on('getNewMembers', async ({excludedUsers}) => {
             const users = await getNewMembers(excludedUsers);
-            console.log('getNewMembers', users);
-            io.emit('newMembers', users);
+
+            socket.emit('newMembers', users);
         });
 
 

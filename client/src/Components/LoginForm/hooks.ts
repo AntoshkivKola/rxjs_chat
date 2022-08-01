@@ -25,6 +25,7 @@ export const useLogin = (setCurrentUser: any) => {
             })
         ).subscribe((res: any) => {
             setCurrentUser(res.response);
+            socketMan.send('join', res.response);
             socketMan.send('getUserGroups', res.response._id)
         },)
 
