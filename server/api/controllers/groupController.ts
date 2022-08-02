@@ -23,6 +23,7 @@ export const addUserToGroup = async (userId: string, groupId: string) => {
         const group = await Groups.findById(groupId);
         group.members.push(userId);
         await group.save();
+        return group;
     } catch (e) {
         console.log(e);
     }
@@ -33,6 +34,7 @@ export const removeUserFromGroup = async (userId: string, groupId: string) => {
         const group = await Groups.findOne({_id: groupId});
         group.members = group.members.filter((id: string) => id.toString() !== userId);
         await group.save();
+        return group;
     } catch (e) {
         console.log(e);
     }

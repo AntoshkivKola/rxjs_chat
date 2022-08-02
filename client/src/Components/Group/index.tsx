@@ -18,7 +18,7 @@ const useGroup = (group: IGroup, groupId: string, setCurrentGroup:any) => {
         });
 
         return () => { subscription.unsubscribe() }
-    }, [])
+    }, [group])
 }
 
 const useDeleteGroup = (deleteGroupButtonId: string ,group: IGroup) => {

@@ -119,9 +119,8 @@ export const initSocket = (server: any) => {
 
         socket.on('addUserToGroup', async ({userId, groupId, currentUserId}: {userId: string, groupId: string, currentUserId: string}) => {
             try {
-                await addUserToGroup(userId, groupId);
+                const currentGroup = await addUserToGroup(userId, groupId);
                 const groups = await getUserGroups(currentUserId) as IGroup[];
-                const currentGroup = groups.find(group => group._id.toString() === groupId);
 
 
                 const addUserSocketId = users[userId];
@@ -139,13 +138,11 @@ export const initSocket = (server: any) => {
 
         socket.on('removeUserFromGroup', async ({userId, groupId, currentUserId}) => {
             try {
-                await removeUserFromGroup(userId, groupId);
-                const groups = await getUserGroups(currentUserId) as IGroup[];
-                const currentGroup = groups.find(group => group._id.toString() === groupId);
-
-                const groupsUpdatedUser = await getUserGroups(userId) as IGroup[];
+                const currentGroup = await removeUserFromGroup(userId, groupId);
+                const groups = await getUserGroups(currentUserId);
+                const groupsUpdatedUser = await getUserGroups(userId);
                 const mainGroup = await getMainGroup();
-                console.log('users', users)
+
                 const removeUserSocketId = users[userId];
                 if (removeUserSocketId) {
                     //@ts-ignore
