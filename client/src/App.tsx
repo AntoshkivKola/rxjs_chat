@@ -32,7 +32,8 @@ const isStandardUser = (user: IUser) => {
 
 export const App: FC = () => {
     const [currentUser, setCurrentUser] = useState<IUser>(initialUser);
-    const [users, setUsers] = useState<IUser[]>([]);
+    const [usersFromCurrentGroup, setUsersFromCurrentGroup] = useState<IUser[]>([]);
+    const [allUsers, setAllUsers] = useState<IUser[]>([]);
     const [messages, setMessages] = useState<IMessage[]>([]);
     const [currentGroup, setCurrentGroup] = useState<IGroup>(initialGroup);
     const [groups, setGroups] = useState<IGroup[]>([]);
@@ -41,18 +42,20 @@ export const App: FC = () => {
         const socketMan = useSocket();
         socketMan.send('getMainGroup', null);
 
-        socketMan.on('getGroup').subscribe(
+        socketMan.on('takeGroup').subscribe(
             (group: IGroup) => {
                 console.log('getGroup', group);
                 setCurrentGroup(group);
                 socketMan.send('getGroupMessages', {groupId: group._id});
                 socketMan.send('getUserFromGroup', {groupId: group._id});
+                socketMan.send('getAllUsers', null);
             }
         );
 
-        socketMan.on('getUsers').subscribe(setUsers);
+        socketMan.on('takeUsersFromGroup').subscribe(setUsersFromCurrentGroup);
+        socketMan.on('takeAllUsers').subscribe(setAllUsers);
         socketMan.on('getMessages').subscribe(setMessages);
-        socketMan.on('getGroups').subscribe(setGroups);
+        socketMan.on('takeGroups').subscribe(setGroups);
 
         return () => { socketMan.disconnect() }
     }, []);
@@ -65,11 +68,14 @@ export const App: FC = () => {
 
         <div className={styles.appContainer}>
             <div className={styles.groupsContainer}>
-                <GroupsList groups={groups} setCurrentGroup={setCurrentGroup}/>
+                <GroupsList groups={groups}
+                            setCurrentGroup={setCurrentGroup}
+                            isLogined={!isStandardUser(currentUser)}
+                            currentUser={currentUser}/>
             </div>
             <div className={styles.chatContainer}>
                 <div className={styles.messagesContainer}>
-                    <Chat messages={messages}  users={users} />
+                    <Chat messages={messages}  users={allUsers} isLogined={!isStandardUser(currentUser)}/>
                 </div>
                 <div className={styles.chatFormContainer}>
                 {{/*!isStandardUser(currentUser)*/} && <ChatForm currentUser={currentUser}
@@ -80,8 +86,9 @@ export const App: FC = () => {
                 <LoginForm currentUser={currentUser} setCurrentUser={setCurrentUser} />
                 {currentUser && <CurrentUser currentUser={currentUser} />}
                 {(!isStandardUser(currentUser) && currentGroup) && <CurrentGroup currentGroup={currentGroup}
-                                               users={users}
-                                               currentUser={currentUser} />}
+                                               users={usersFromCurrentGroup}
+                                               currentUser={currentUser}
+                                              />}
             </div>
 
 

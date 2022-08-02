@@ -37,3 +37,23 @@ export const removeUserFromGroup = async (userId: string, groupId: string) => {
         console.log(e);
     }
 }
+
+export const createGroup = async (name: string, owner_id: string) => {
+    try {
+        return await Groups.create({
+            name,
+            owner_id,
+            members: [owner_id],
+        });
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+export const deleteGroup = async (groupId: string) => {
+    try {
+        await Groups.findOneAndDelete({_id: groupId});
+    } catch (e) {
+        console.log(e);
+    }
+}

@@ -69,3 +69,11 @@ export const getNewMembers = async (excludedUsers: string[]) => {
         console.log(e);
     }
 }
+
+export const getAllUsers = async () => {
+    try {
+        return await Users.find();
+    } catch (e) {
+        console.log(e);
+    }
+}
