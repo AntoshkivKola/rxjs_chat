@@ -9,6 +9,7 @@ import {Chat} from "./Components/Chat";
 import styles from './App.module.scss';
 import {GroupsList} from "./Components/GroupsList";
 import {CurrentGroup} from "./Components/CurrentGroup";
+import {Logout} from "./Components/Logout";
 
 const initialUser = {
     _id: '',
@@ -83,7 +84,11 @@ export const App: FC = () => {
                 </div>
             </div>
             <div className={styles.userContainer}>
-                <LoginForm currentUser={currentUser} setCurrentUser={setCurrentUser} />
+                {isStandardUser(currentUser) ?
+                    <LoginForm currentUser={currentUser} setCurrentUser={setCurrentUser} /> :
+                    <Logout setCurrentUser={setCurrentUser} initialUser={initialUser}/>}
+
+
                 {currentUser && <CurrentUser currentUser={currentUser} />}
                 {(!isStandardUser(currentUser) && currentGroup) && <CurrentGroup currentGroup={currentGroup}
                                                users={usersFromCurrentGroup}
